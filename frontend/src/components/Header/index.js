@@ -3,11 +3,11 @@ import Link from "next/link";
 import Logo from "./Logo";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../Hooks/useAuth"; // Import AuthContext
+import { useAuth } from "../Hooks/useAuth"; 
 
 const Header = () => {
   const [click, setClick] = useState(false);
-  const { isAuthenticated, logout } = useAuth(); // Get auth state and logout function
+  const { isAuthenticated, logout } = useAuth(); 
   const router = useRouter();
 
   const toggle = () => setClick(!click);

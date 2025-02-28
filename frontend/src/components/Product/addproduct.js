@@ -2,6 +2,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function ProductForm() {
   const [name, setName] = useState("");
@@ -52,15 +54,23 @@ export default function ProductForm() {
         data: data,
       };
 
-      await axios.request(config);
-      setMessage("Product added successfully!");
-      router.push("/");
-      setName("");
-      setPrice("");
-      setDescription("");
+      let res = await axios.request(config);
+      // setMessage("Product added successfully!");
+      if(res.data.statusCode==201){
+        toast.success(res.data.message);
+        setTimeout(() => {
+          router.push("/");  
+        }, 1000);
+        
+        setName("");
+        setPrice("");
+        setDescription("");
+      }else{
+        toast.error(res.data.message);
+      }
     } catch (error) {
       console.log(error);
-      setMessage("Failed to add product.");
+      toast.error("Failed to add product.");
     }
   };
 

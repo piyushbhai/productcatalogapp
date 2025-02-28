@@ -19,8 +19,8 @@ export default function Login() {
 
     try {
       let data = JSON.stringify({
-        "username": "piyush",
-        "password": "piyush@123"
+        "username": username,
+        "password": password
       });
       
       let config = {
@@ -35,7 +35,10 @@ export default function Login() {
       
       let res = await axios.request(config)
 
-      login(res.token); 
+      login(res.data.token);
+      if(res.data.token){
+        localStorage.setItem("token",res.data.token)
+      } 
       router.push("/");
       router.refresh();
     } catch (error) {

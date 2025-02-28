@@ -2,6 +2,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaTrash } from 'react-icons/fa';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useAuth } from "../Hooks/useAuth"; 
 
 const RecentProducts = () => {
   const [loading, setLoading] = useState(false);
@@ -10,11 +13,40 @@ const RecentProducts = () => {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [sort, setSort] = useState(""); 
+  const { isAuthenticated } = useAuth(); 
 
   useEffect(() => {
     fetchProducts();
   }, []); 
 
+  const handleDelete = async (id) => {
+    try {
+      let token = localStorage.getItem("token")
+      setLoading(true);
+      let config = {
+        method: 'delete',
+        maxBodyLength: Infinity,
+        url: 'http://localhost:5000/products/'+id,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      
+      let res = await axios.request(config)
+      if(res?.data.statusCode==200){
+        fetchProducts();
+        toast.success(res.data.message);
+      }else{
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      // console.log(error.response.data.message)
+      toast.error(error?.response?.data?.error+" : "+error?.response?.data?.message);
+    } finally {
+      setLoading(false);
+    }
+    
+  }
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -139,6 +171,7 @@ const RecentProducts = () => {
                         src={getRandomImage()}
                         alt={product.name}
                       />
+                       {isAuthenticated && (
                       <button
                         onClick={() => handleDelete(product.id)}
                         className="absolute top-2 right-2 z-20 p-1 bg-white rounded-full shadow hover:bg-gray-200 transition-colors"
@@ -146,6 +179,7 @@ const RecentProducts = () => {
                       >
                         <FaTrash className="text-red-500" />
                       </button>
+                      )}
                       <div className="absolute z-10 bottom-3 left-0 mx-3 p-3 bg-white w-[calc(100%-24px)] rounded-xl shadow-sm transition-all duration-500 group-hover:shadow-indigo-200 group-hover:bg-indigo-50">
                         <div className="flex items-center justify-between mb-2">
                           <h6 className="font-semibold text-base leading-7 text-black">
