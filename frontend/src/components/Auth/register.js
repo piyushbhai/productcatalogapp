@@ -3,43 +3,30 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
-import { useAuth } from "../Hooks/useAuth";
 
-export default function Login() {
+export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { login } = useAuth(); 
-
-  const handleLogin = async (e) => {
+ 
+  const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      let data = JSON.stringify({
-        "username": "piyush",
-        "password": "piyush@123"
+      const { data } = await axios.post("http://localhost:5000/auth/signup", {
+        username: username,
+        password: password,
+      }, {
+        headers: { "Content-Type": "application/json" },
       });
-      
-      let config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: 'http://localhost:5000/auth/login',
-        headers: { 
-          'Content-Type': 'application/json'
-        },
-        data : data
-      };
-      
-      let res = await axios.request(config)
-
-      login(res.token); 
-      router.push("/");
+      setMessage("You have successfully Signup please wait...!");
+      router.push("/login");
       router.refresh();
     } catch (error) {
-      setMessage("Invalid credentials!");
+      setMessage("Fail to Signup please try again later!");
     } finally {
       setLoading(false);
     }
@@ -47,9 +34,9 @@ export default function Login() {
 
   return (
     <div className="p-10 mx-auto border border-gray-40 rounded-lg">
-      <h2 className="text-xl font-bold mb-4 text-light">Login</h2>
+      <h2 className="text-xl font-bold mb-4 text-light">Register</h2>
       {message && <p className="text-red-500">{message}</p>}
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleRegister}>
         <input
           type="text"
           placeholder="Username"
@@ -65,10 +52,10 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
         />
         <button className="p-2 bg-blue-500 text-white rounded w-full" type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Signing up..." : "Signup"}
         </button>
         <p className="text-center text-light mt-4">
-          Don't have an account? <Link href="/register" className="text-blue-500">Register</Link>
+          Already have an account? <Link href="/login" className="text-blue-500">Login</Link>
         </p>
       </form>
     </div>
